@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-coral: #E8736A;
+  --color-coral-dark: #d45f56;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #E8736A;
+  min-height: 100svh;
+}
+
+#root {
+  min-height: 100svh;
+}
