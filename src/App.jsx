@@ -49,7 +49,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-svh bg-[#E8736A] flex flex-col">
+    <div className="min-h-svh bg-[#fa6f77] flex flex-col">
       {/* Header */}
       <header className="px-6 pt-8 pb-4">
         <p className="text-white/60 text-xs uppercase tracking-widest mb-1">
@@ -169,7 +169,7 @@ export default function App() {
                   contact: { wantsContact: false, email: '', phone: '' },
                 });
               }}
-              className="w-full bg-white text-[#E8736A] font-black uppercase py-4 rounded-2xl text-lg"
+              className="w-full bg-white text-[#fa6f77] font-black uppercase py-4 rounded-2xl text-lg"
             >
               Make another report
             </button>
@@ -193,7 +193,7 @@ export default function App() {
             disabled={!canAdvance()}
             className={`flex-1 font-black uppercase py-4 rounded-2xl text-base transition-all ${
               canAdvance()
-                ? 'bg-white text-[#E8736A]'
+                ? 'bg-white text-[#fa6f77]'
                 : 'bg-white/30 text-white/50 cursor-not-allowed'
             }`}
           >
