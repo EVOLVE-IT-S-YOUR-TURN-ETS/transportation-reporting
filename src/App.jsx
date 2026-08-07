@@ -2,6 +2,8 @@ import { useState } from 'react';
 import StationPicker from './components/StationPicker';
 import IssueSelector from './components/IssueSelector';
 
+const WEBHOOK_URL = 'https://script.google.com/a/macros/evolveitsyourturn.org/s/AKfycbyQ9KLQSc6gW_2H7FyJSO4Aap_vB_aLwAnC1FUy7619lzkLKi81iLHQ4olBOg68-1iDsg/exec';
+
 // Read city and lang from URL params: ?city=bologna&lang=en
 const params = new URLSearchParams(window.location.search);
 const CITY = params.get('city') || 'bologna';
@@ -20,7 +22,24 @@ export default function App() {
     contact: { wantsContact: false, email: '', phone: '' },
   });
 
-  function next() { setStep((s) => Math.min(s + 1, STEPS.length - 1)); }
+  const [submitting, setSubmitting] = useState(false);
+
+  async function next() {
+    if (STEPS[step] === 'contact') {
+      setSubmitting(true);
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          body: JSON.stringify(report),
+        });
+      } catch (err) {
+        console.error('Submission failed:', err);
+      }
+      setSubmitting(false);
+    }
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  }
+
   function back() { setStep((s) => Math.max(s - 1, 0)); }
 
   function canAdvance() {
@@ -178,7 +197,7 @@ export default function App() {
                 : 'bg-white/30 text-white/50 cursor-not-allowed'
             }`}
           >
-            {STEPS[step] === 'contact' ? 'Submit' : 'Next'}
+            {submitting ? 'Sending...' : STEPS[step] === 'contact' ? 'Submit' : 'Next'}
           </button>
         </div>
       )}
