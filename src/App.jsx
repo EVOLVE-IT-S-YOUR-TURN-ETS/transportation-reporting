@@ -177,6 +177,15 @@ export default function App() {
         )}
       </main>
 
+      {/* Partner logos */}
+      <footer className="px-6 pb-4 pt-2">
+        <img
+          src="/partner-logos.png"
+          alt="Co-funded by the European Union | NEXO | EVOLVE | You in Europe"
+          className="w-full max-w-sm mx-auto block"
+        />
+      </footer>
+
       {/* Navigation */}
       {STEPS[step] !== 'done' && (
         <div className="px-6 pb-8 flex gap-3">
