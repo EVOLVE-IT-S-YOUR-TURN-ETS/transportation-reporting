@@ -1,21 +1,30 @@
 import { useState } from 'react';
 import StationPicker from './components/StationPicker';
 import IssueSelector from './components/IssueSelector';
+import { t } from './data/translations';
 
 const WEBHOOK_URL = 'https://script.google.com/a/macros/evolveitsyourturn.org/s/AKfycbyQ9KLQSc6gW_2H7FyJSO4Aap_vB_aLwAnC1FUy7619lzkLKi81iLHQ4olBOg68-1iDsg/exec';
 
 // Read city and lang from URL params: ?city=bologna&lang=en
 const params = new URLSearchParams(window.location.search);
 const CITY = params.get('city') || 'bologna';
-const LANG = params.get('lang') || 'en';
+const INITIAL_LANG = params.get('lang') || 'en';
+
+const LANGUAGES = [
+  { code: 'en', flag: '🇬🇧' },
+  { code: 'it', flag: '🇮🇹' },
+  { code: 'el', flag: '🇬🇷' },
+  { code: 'es', flag: '🇪🇸' },
+];
 
 const STEPS = ['station', 'issue', 'details', 'contact', 'done'];
 
 export default function App() {
   const [step, setStep] = useState(0);
+  const [lang, setLang] = useState(INITIAL_LANG);
   const [report, setReport] = useState({
     city: CITY,
-    lang: LANG,
+    lang: INITIAL_LANG,
     station: null,
     issue: null,
     details: '',
@@ -42,6 +51,14 @@ export default function App() {
 
   function back() { setStep((s) => Math.max(s - 1, 0)); }
 
+  function changeLang(code) {
+    setLang(code);
+    setReport((r) => ({ ...r, lang: code }));
+    const url = new URL(window.location);
+    url.searchParams.set('lang', code);
+    window.history.replaceState({}, '', url);
+  }
+
   function canAdvance() {
     if (STEPS[step] === 'station') return !!report.station;
     if (STEPS[step] === 'issue') return !!report.issue?.category;
@@ -52,11 +69,27 @@ export default function App() {
     <div className="min-h-svh bg-[#fa6f77] flex flex-col">
       {/* Header */}
       <header className="px-6 pt-8 pb-4">
-        <p className="text-white/60 text-xs uppercase tracking-widest mb-1">
-          {CITY.charAt(0).toUpperCase() + CITY.slice(1)}
-        </p>
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <p className="text-white/60 text-xs uppercase tracking-widest">
+            {CITY.charAt(0).toUpperCase() + CITY.slice(1)}
+          </p>
+          <div className="flex gap-1.5">
+            {LANGUAGES.map(({ code, flag }) => (
+              <button
+                key={code}
+                onClick={() => changeLang(code)}
+                aria-label={code}
+                className={`w-7 h-7 rounded-full text-sm flex items-center justify-center transition-all ${
+                  lang === code ? 'bg-white' : 'bg-white/20'
+                }`}
+              >
+                {flag}
+              </button>
+            ))}
+          </div>
+        </div>
         <h1 className="text-white text-2xl font-black uppercase leading-tight">
-          Report a transport issue
+          {t(lang, 'reportIssue')}
         </h1>
       </header>
 
@@ -77,9 +110,10 @@ export default function App() {
 
         {STEPS[step] === 'station' && (
           <section>
-            <h2 className="text-white font-bold text-lg mb-4">Where are you?</h2>
+            <h2 className="text-white font-bold text-lg mb-4">{t(lang, 'whereAreYou')}</h2>
             <StationPicker
               city={CITY}
+              lang={lang}
               onSelect={(station) => setReport((r) => ({ ...r, station }))}
             />
           </section>
@@ -87,8 +121,9 @@ export default function App() {
 
         {STEPS[step] === 'issue' && (
           <section>
-            <h2 className="text-white font-bold text-lg mb-4">What's the issue?</h2>
+            <h2 className="text-white font-bold text-lg mb-4">{t(lang, 'whatsTheIssue')}</h2>
             <IssueSelector
+              lang={lang}
               onSelect={(issue) => setReport((r) => ({ ...r, issue }))}
             />
           </section>
@@ -96,10 +131,10 @@ export default function App() {
 
         {STEPS[step] === 'details' && (
           <section>
-            <h2 className="text-white font-bold text-lg mb-4">Anything else to add?</h2>
+            <h2 className="text-white font-bold text-lg mb-4">{t(lang, 'anythingElse')}</h2>
             <textarea
               className="w-full p-4 rounded-xl text-gray-800 text-base min-h-32 resize-none"
-              placeholder="Optional — any extra details..."
+              placeholder={t(lang, 'detailsPlaceholder')}
               value={report.details}
               onChange={(e) => setReport((r) => ({ ...r, details: e.target.value }))}
             />
@@ -108,8 +143,8 @@ export default function App() {
 
         {STEPS[step] === 'contact' && (
           <section>
-            <h2 className="text-white font-bold text-lg mb-2">Want a follow-up?</h2>
-            <p className="text-white/70 text-sm mb-4">We may contact you for more information.</p>
+            <h2 className="text-white font-bold text-lg mb-2">{t(lang, 'wantFollowUp')}</h2>
+            <p className="text-white/70 text-sm mb-4">{t(lang, 'followUpNote')}</p>
             <label className="flex items-center gap-3 bg-white/20 rounded-xl p-4 mb-4 cursor-pointer">
               <input
                 type="checkbox"
@@ -122,14 +157,14 @@ export default function App() {
                   }))
                 }
               />
-              <span className="text-white font-semibold">Yes, contact me</span>
+              <span className="text-white font-semibold">{t(lang, 'yesContactMe')}</span>
             </label>
             {report.contact.wantsContact && (
               <div className="space-y-3">
                 <input
                   type="email"
                   className="w-full p-3 rounded-xl text-gray-800"
-                  placeholder="Email address"
+                  placeholder={t(lang, 'emailPlaceholder')}
                   value={report.contact.email}
                   onChange={(e) =>
                     setReport((r) => ({
@@ -141,7 +176,7 @@ export default function App() {
                 <input
                   type="tel"
                   className="w-full p-3 rounded-xl text-gray-800"
-                  placeholder="Phone number (optional)"
+                  placeholder={t(lang, 'phonePlaceholder')}
                   value={report.contact.phone}
                   onChange={(e) =>
                     setReport((r) => ({
@@ -158,20 +193,20 @@ export default function App() {
         {STEPS[step] === 'done' && (
           <section className="text-center pt-8">
             <div className="text-6xl mb-4">✓</div>
-            <h2 className="text-white text-2xl font-black uppercase mb-2">Thank you!</h2>
-            <p className="text-white/80 mb-8">Your report has been submitted.</p>
+            <h2 className="text-white text-2xl font-black uppercase mb-2">{t(lang, 'thankYou')}</h2>
+            <p className="text-white/80 mb-8">{t(lang, 'reportSubmitted')}</p>
             <button
               onClick={() => {
                 setStep(0);
                 setReport({
-                  city: CITY, lang: LANG,
+                  city: CITY, lang,
                   station: null, issue: null, details: '',
                   contact: { wantsContact: false, email: '', phone: '' },
                 });
               }}
               className="w-full bg-white text-[#fa6f77] font-black uppercase py-4 rounded-2xl text-lg"
             >
-              Make another report
+              {t(lang, 'makeAnotherReport')}
             </button>
           </section>
         )}
@@ -181,7 +216,7 @@ export default function App() {
       <footer className="px-6 pb-4 pt-2">
         <img
           src="/partner-logos.png"
-          alt="Co-funded by the European Union | NEXO | EVOLVE | You in Europe"
+          alt={t(lang, 'partnerLogosAlt')}
           className="w-full max-w-sm mx-auto block"
         />
       </footer>
@@ -194,7 +229,7 @@ export default function App() {
               onClick={back}
               className="flex-1 bg-white/20 text-white font-bold py-4 rounded-2xl text-base"
             >
-              Back
+              {t(lang, 'back')}
             </button>
           )}
           <button
@@ -206,7 +241,7 @@ export default function App() {
                 : 'bg-white/30 text-white/50 cursor-not-allowed'
             }`}
           >
-            {submitting ? 'Sending...' : STEPS[step] === 'contact' ? 'Submit' : 'Next'}
+            {submitting ? t(lang, 'sending') : STEPS[step] === 'contact' ? t(lang, 'submit') : t(lang, 'next')}
           </button>
         </div>
       )}

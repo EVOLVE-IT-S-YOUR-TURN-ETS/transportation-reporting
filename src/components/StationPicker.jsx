@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useGeolocation } from '../utils/useGeolocation';
 import { findNearestStop } from '../utils/haversine';
+import { t } from '../data/translations';
 
-export default function StationPicker({ city, onSelect }) {
+export default function StationPicker({ city, lang, onSelect }) {
   const { loading, error, coords } = useGeolocation();
   const [stops, setStops] = useState([]);
   const [nearest, setNearest] = useState(null);
@@ -32,7 +33,7 @@ export default function StationPicker({ city, onSelect }) {
   if (loading) {
     return (
       <div className="text-white text-center py-4">
-        <p className="text-lg">Finding your nearest stop...</p>
+        <p className="text-lg">{t(lang, 'findingNearestStop')}</p>
       </div>
     );
   }
@@ -42,14 +43,14 @@ export default function StationPicker({ city, onSelect }) {
     return (
       <div>
         <p className="text-white/80 text-sm mb-2">
-          Enable location for auto-detection, or choose your stop below.
+          {t(lang, 'enableLocationNote')}
         </p>
         <select
           className="w-full p-3 rounded-xl text-gray-800 text-base"
           onChange={handleChange}
           defaultValue=""
         >
-          <option value="" disabled>Select a stop...</option>
+          <option value="" disabled>{t(lang, 'selectAStop')}</option>
           {stops.map((s) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
@@ -62,7 +63,7 @@ export default function StationPicker({ city, onSelect }) {
     <div>
       {nearest && !showAll && (
         <div className="bg-white/20 rounded-xl p-4 mb-3">
-          <p className="text-white/70 text-sm uppercase tracking-wide mb-1">Nearest stop</p>
+          <p className="text-white/70 text-sm uppercase tracking-wide mb-1">{t(lang, 'nearestStop')}</p>
           <p className="text-white text-xl font-bold">{nearest.name}</p>
         </div>
       )}
@@ -82,7 +83,7 @@ export default function StationPicker({ city, onSelect }) {
           className="text-white/80 underline text-sm"
           onClick={() => setShowAll(true)}
         >
-          Choose a different stop
+          {t(lang, 'chooseDifferentStop')}
         </button>
       )}
     </div>

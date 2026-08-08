@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { issueCategories } from '../data/issues';
+import { issueCategories, getLabel } from '../data/issues';
+import { t } from '../data/translations';
 
-export default function IssueSelector({ onSelect }) {
+export default function IssueSelector({ lang, onSelect }) {
   const [category, setCategory] = useState(null);
   const [subcategory, setSubcategory] = useState(null);
   const [otherCategory, setOtherCategory] = useState('');
@@ -22,7 +23,7 @@ export default function IssueSelector({ onSelect }) {
     <div className="space-y-4">
       {/* Category */}
       <div>
-        <p className="text-white/70 text-sm uppercase tracking-wide mb-2">Issue type</p>
+        <p className="text-white/70 text-sm uppercase tracking-wide mb-2">{t(lang, 'issueType')}</p>
         <div className="grid grid-cols-2 gap-2">
           {issueCategories.map((cat) => (
             <button
@@ -34,18 +35,18 @@ export default function IssueSelector({ onSelect }) {
                   : 'bg-white/20 text-white'
               }`}
             >
-              {cat.label}
+              {getLabel(cat.label, lang)}
             </button>
           ))}
         </div>
         {category?.id === 'other' && (
           <input
             className="mt-2 w-full p-3 rounded-xl text-gray-800"
-            placeholder="Describe the issue..."
+            placeholder={t(lang, 'describeIssue')}
             value={otherCategory}
             onChange={(e) => {
               setOtherCategory(e.target.value);
-              onSelect({ category: { ...category, label: e.target.value }, subcategory: null });
+              onSelect({ category: { ...category, label: { en: e.target.value } }, subcategory: null });
             }}
           />
         )}
@@ -54,7 +55,7 @@ export default function IssueSelector({ onSelect }) {
       {/* Subcategory */}
       {category && category.id !== 'other' && category.subcategories.length > 0 && (
         <div>
-          <p className="text-white/70 text-sm uppercase tracking-wide mb-2">More specifically</p>
+          <p className="text-white/70 text-sm uppercase tracking-wide mb-2">{t(lang, 'moreSpecifically')}</p>
           <div className="flex flex-col gap-2">
             {category.subcategories.map((sub) => (
               <button
@@ -66,28 +67,28 @@ export default function IssueSelector({ onSelect }) {
                     : 'bg-white/20 text-white'
                 }`}
               >
-                {sub.label}
+                {getLabel(sub.label, lang)}
               </button>
             ))}
             <button
-              onClick={() => handleSub({ id: 'other', label: '' })}
+              onClick={() => handleSub({ id: 'other', label: { en: '' } })}
               className={`p-3 rounded-xl text-sm font-semibold text-left transition-all ${
                 subcategory?.id === 'other'
                   ? 'bg-white text-coral'
                   : 'bg-white/20 text-white'
               }`}
             >
-              Other
+              {t(lang, 'other')}
             </button>
           </div>
           {subcategory?.id === 'other' && (
             <input
               className="mt-2 w-full p-3 rounded-xl text-gray-800"
-              placeholder="Describe more specifically..."
+              placeholder={t(lang, 'describeMoreSpecifically')}
               value={otherSub}
               onChange={(e) => {
                 setOtherSub(e.target.value);
-                onSelect({ category, subcategory: { id: 'other', label: e.target.value } });
+                onSelect({ category, subcategory: { id: 'other', label: { en: e.target.value } } });
               }}
             />
           )}
