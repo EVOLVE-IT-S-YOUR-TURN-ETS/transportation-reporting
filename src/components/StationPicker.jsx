@@ -1,32 +1,54 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useGeolocation } from '../utils/useGeolocation';
 import { findNearestStop } from '../utils/haversine';
 import { t } from '../data/translations';
 
 export default function StationPicker({ city, lang, onSelect }) {
   const { loading, error, coords } = useGeolocation();
-  const [stops, setStops] = useState([]);
+  const [rawStops, setRawStops] = useState([]);
   const [nearest, setNearest] = useState(null);
   const [showAll, setShowAll] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [selectedIdx, setSelectedIdx] = useState(null);
 
   useEffect(() => {
     if (!city) return;
-    import(`../data/stops/${city}.json`).then((mod) => setStops(mod.default));
+    import(`../data/stops/${city}.json`).then((mod) => setRawStops(mod.default));
   }, [city]);
+
+  // Normalize every stop so downstream code doesn't have to worry about
+  // whether the entry has `id` (single) or `ids` (array). Attach a synthetic
+  // `_key` that is guaranteed unique-per-render for React and never touches
+  // the underlying data.
+  const stops = useMemo(
+    () =>
+      rawStops.map((s, i) => ({
+        ...s,
+        _key: String(s.id ?? (Array.isArray(s.ids) ? s.ids.join('-') : i)),
+      })),
+    [rawStops]
+  );
 
   useEffect(() => {
     if (coords && stops.length > 0) {
       const { stop } = findNearestStop(coords.lat, coords.lon, stops);
-      setNearest(stop);
-      setSelected(stop);
-      onSelect(stop);
+      if (stop) {
+        const idx = stops.indexOf(stop);
+        setNearest(stop);
+        setSelectedIdx(idx);
+        onSelect(stop);
+      }
     }
+    // onSelect intentionally omitted — parent's reference changes each render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coords, stops]);
 
+  // Lookup by index (from the <option value={i}>) — always finds the row,
+  // regardless of whether the data has id/ids/nothing.
   function handleChange(e) {
-    const stop = stops.find((s) => s.id === e.target.value);
-    setSelected(stop);
+    const idx = Number(e.target.value);
+    const stop = stops[idx];
+    if (!stop) return;                      // guard against the empty "select…" option
+    setSelectedIdx(idx);
     onSelect(stop);
   }
 
@@ -39,7 +61,6 @@ export default function StationPicker({ city, lang, onSelect }) {
   }
 
   if (error || !coords) {
-    // Location denied or unavailable — show full dropdown
     return (
       <div>
         <p className="text-white/80 text-sm mb-2">
@@ -48,11 +69,11 @@ export default function StationPicker({ city, lang, onSelect }) {
         <select
           className="w-full p-3 rounded-xl text-gray-800 text-base"
           onChange={handleChange}
-          defaultValue=""
+          value={selectedIdx ?? ''}
         >
           <option value="" disabled>{t(lang, 'selectAStop')}</option>
-          {stops.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+          {stops.map((s, i) => (
+            <option key={s._key} value={i}>{s.name}</option>
           ))}
         </select>
       </div>
@@ -72,10 +93,11 @@ export default function StationPicker({ city, lang, onSelect }) {
         <select
           className="w-full p-3 rounded-xl text-gray-800 text-base"
           onChange={handleChange}
-          defaultValue={selected?.id ?? ''}
+          value={selectedIdx ?? ''}
         >
-          {stops.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+          <option value="" disabled>{t(lang, 'selectAStop')}</option>
+          {stops.map((s, i) => (
+            <option key={s._key} value={i}>{s.name}</option>
           ))}
         </select>
       ) : (
