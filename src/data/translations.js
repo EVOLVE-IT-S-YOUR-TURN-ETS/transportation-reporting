@@ -3,6 +3,10 @@
 
 export const translations = {
   en: {
+    detectingLocation: 'Finding your location...',
+    submitFailed: 'Could not send your report. Check your connection and try again.',
+    selectYourCity: 'Select your city',
+    selectCityNote: 'We could not detect your location. Choose your city to continue.',
     reportIssue: 'Report a transport issue',
     whereAreYou: 'Where are you?',
     whatsTheIssue: "What's the issue?",
@@ -36,6 +40,10 @@ export const translations = {
   },
 
   it: {
+    detectingLocation: 'Rilevamento della posizione...',
+    submitFailed: 'Impossibile inviare la segnalazione. Controlla la connessione e riprova.',
+    selectYourCity: 'Seleziona la tua città',
+    selectCityNote: 'Non siamo riusciti a rilevare la tua posizione. Scegli la tua città per continuare.',
     reportIssue: 'Segnala un problema di trasporto',
     whereAreYou: 'Dove ti trovi?',
     whatsTheIssue: 'Qual è il problema?',
@@ -69,6 +77,10 @@ export const translations = {
   },
 
   el: {
+    detectingLocation: 'Εντοπισμός της τοποθεσίας σου...',
+    submitFailed: 'Δεν ήταν δυνατή η αποστολή της αναφοράς. Έλεγξε τη σύνδεσή σου και δοκίμασε ξανά.',
+    selectYourCity: 'Επίλεξε την πόλη σου',
+    selectCityNote: 'Δεν μπορέσαμε να εντοπίσουμε την τοποθεσία σου. Επίλεξε την πόλη σου για να συνεχίσεις.',
     reportIssue: 'Αναφορά προβλήματος συγκοινωνίας',
     whereAreYou: 'Πού βρίσκεσαι;',
     whatsTheIssue: 'Ποιο είναι το πρόβλημα;',
@@ -102,6 +114,10 @@ export const translations = {
   },
 
   es: {
+    detectingLocation: 'Detectando tu ubicación...',
+    submitFailed: 'No se pudo enviar tu reporte. Comprueba tu conexión e inténtalo de nuevo.',
+    selectYourCity: 'Selecciona tu ciudad',
+    selectCityNote: 'No pudimos detectar tu ubicación. Elige tu ciudad para continuar.',
     reportIssue: 'Reportar un problema de transporte',
     whereAreYou: '¿Dónde estás?',
     whatsTheIssue: '¿Cuál es el problema?',

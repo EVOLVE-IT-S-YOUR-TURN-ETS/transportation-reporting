@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useGeolocation } from '../utils/useGeolocation';
 import { findNearestStop } from '../utils/haversine';
 import { t } from '../data/translations';
 
-export default function StationPicker({ city, lang, onSelect }) {
-  const { loading, error, coords } = useGeolocation();
+// `geo` comes from App, which requests the position once and shares it,
+// so the reporter is only prompted for location a single time.
+export default function StationPicker({ city, lang, geo, onSelect }) {
+  const { loading, error, coords } = geo;
   const [rawStops, setRawStops] = useState([]);
   const [nearest, setNearest] = useState(null);
   const [showAll, setShowAll] = useState(false);
@@ -12,7 +13,12 @@ export default function StationPicker({ city, lang, onSelect }) {
 
   useEffect(() => {
     if (!city) return;
-    import(`../data/stops/${city}.json`).then((mod) => setRawStops(mod.default));
+    import(`../data/stops/${city}.json`)
+      .then((mod) => setRawStops(mod.default))
+      .catch((err) => {
+        console.error(`No stop data available for city "${city}"`, err);
+        setRawStops([]);
+      });
   }, [city]);
 
   // Normalize every stop so downstream code doesn't have to worry about
