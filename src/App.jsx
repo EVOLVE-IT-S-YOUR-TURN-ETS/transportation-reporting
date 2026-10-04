@@ -156,7 +156,7 @@ export default function App() {
 
         <footer className="px-6 pb-8 pt-2">
           <img
-            src="/partner-logos.png"
+            src={`${import.meta.env.BASE_URL}partner-logos.png`}
             alt={t(lang, 'partnerLogosAlt')}
             className="w-full max-w-sm mx-auto block"
           />
@@ -315,7 +315,7 @@ export default function App() {
       {/* Partner logos */}
       <footer className="px-6 pb-4 pt-2">
         <img
-          src="/partner-logos.png"
+          src={`${import.meta.env.BASE_URL}partner-logos.png`}
           alt={t(lang, 'partnerLogosAlt')}
           className="w-full max-w-sm mx-auto block"
         />
