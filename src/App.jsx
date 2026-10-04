@@ -6,7 +6,7 @@ import { useGeolocation } from './utils/useGeolocation';
 import { detectCity } from './utils/detectCity';
 import { CITIES, ALL_LANGUAGES, getCity, languagesFor, defaultLangFor } from './data/cities';
 
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzE1-_L8vczK5g1k1B8UMfpu0yYjmW7hf55j-BQt2_9_NOU_boJdVLfnAJaYtAdu_ZklA/exec';
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbyVB-EOb0Dftgmcgs8qvk1pDcSpmBDLt9T6LQtlay0lEBxwfkZquGw9GiIeaFVUU_C3vw/exec';
 
 // Read city and lang from URL params: ?city=bologna&lang=en
 // No default for city — if it's missing, the user picks it on a first screen.
