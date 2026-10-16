@@ -7,7 +7,7 @@ import { detectCity } from './utils/detectCity';
 import { CITIES, ALL_LANGUAGES, getCity, languagesFor, defaultLangFor } from './data/cities';
 import { haversineDistance } from './utils/haversine';
 
-const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbzOypxjzghYxRixlqbH9ZjZzhwQOWQ86Kep2XJKKSVmLj4Pmu0qcwJjFhiegKu6nBz_sg/exec';
+const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxJmZcwkLRzQNhyRD2xmfq0nmfi20jhtjelKla_uYtUGlv0q-XOrm5w8yEL0-qMijs82g/exec';
 
 const params = new URLSearchParams(window.location.search);
 const INITIAL_CITY = params.get('city') || null;
