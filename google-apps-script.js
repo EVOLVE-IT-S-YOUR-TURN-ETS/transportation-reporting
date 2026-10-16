@@ -1,21 +1,27 @@
 // Paste this entire file into your Google Apps Script editor
-// Extensions → Apps Script → replace everything → Deploy as Web App
+// Extensions > Apps Script > replace everything > Save > Deploy as Web App
 
-const SPREADSHEET_ID = "1DbzgT0NQGg_Dfo1dsijc1d6X99AzUI0IJRUCp_fKvKo";
-const SHEET_NAME = "Foglio1";
+var SPREADSHEET_ID = "1DbzgT0NQGg_Dfo1dsijc1d6X99AzUI0IJRUCp_fKvKo";
+var SHEET_NAME = "Foglio1";
+
+function getLabel(labelObj) {
+  if (!labelObj) return "";
+  if (typeof labelObj === "string") return labelObj;
+  return labelObj.en || labelObj.it || labelObj.el || labelObj.es || "";
+}
 
 function doPost(e) {
   try {
-    const data = JSON.parse(e.postData.contents);
+    var data = JSON.parse(e.postData.contents);
 
-    // Honeypot check — silently reject bots
+    // Honeypot check - silently reject bots
     if (data.honeypot) {
       return ContentService
         .createTextOutput(JSON.stringify({ success: true }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
+    var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(SHEET_NAME);
 
     // Write header row if sheet is empty
     if (sheet.getLastRow() === 0) {
@@ -36,30 +42,35 @@ function doPost(e) {
         "Demographics Consent",
         "Gender",
         "Age Range",
-        "Income",
+        "Income"
       ]);
     }
 
-    const demo = data.demographics || {};
+    var demo = data.demographics || {};
+    var station = data.station || {};
+    var issue = data.issue || {};
+    var category = issue.category || {};
+    var subcategory = issue.subcategory || {};
+    var contact = data.contact || {};
 
     sheet.appendRow([
       new Date().toISOString(),
       data.sessionId || "",
       data.city || "",
       data.lang || "",
-      data.station?.id || "",
-      data.station?.name || "",
-      data.issue?.category?.label || "",
-      data.issue?.subcategory?.label || "",
+      station.id || "",
+      station.name || "",
+      getLabel(category.label),
+      getLabel(subcategory.label),
       data.details || "",
       data.distanceBucket || "unavailable",
-      data.contact?.wantsContact ? "Yes" : "No",
-      data.contact?.email || "",
-      data.contact?.phone || "",
+      contact.wantsContact ? "Yes" : "No",
+      contact.email || "",
+      contact.phone || "",
       demo.wantsDemographics ? "Yes" : "No",
       demo.gender || "",
       demo.age || "",
-      demo.income || "",
+      demo.income || ""
     ]);
 
     return ContentService
@@ -73,7 +84,6 @@ function doPost(e) {
   }
 }
 
-// Handles CORS preflight
 function doGet(e) {
   return ContentService
     .createTextOutput(JSON.stringify({ status: "ok" }))
